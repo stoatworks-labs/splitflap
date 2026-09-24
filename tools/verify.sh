@@ -208,6 +208,22 @@ else
 	fail "a reader that hung up got exit $pipe_status, expected 1"
 fi
 
+step "demo: the browser copy of the shaders"
+# demo/plugin.js cannot include a C++ file, so it carries its own copy of every
+# shader and of the font's glyph table; the page's claim to run the plugin's
+# own shaders rests on the two staying identical, and only this check enforces
+# it. demo/tools/splice_shaders.py writes the copy; never edit it by hand.
+if [ -f demo/tools/check_shaders.py ]; then
+	if out=$(python3 demo/tools/check_shaders.py 2>&1); then
+		pass "$( printf '%s\n' "$out" | tail -1 )"
+	else
+		fail "the demo's shaders have drifted from source/Shaders.cpp -- run demo/tools/splice_shaders.py"
+		printf '%s\n' "$out" | grep -E '^FAIL' | sed 's/^/      /'
+	fi
+else
+	printf '   skipped: no demo/\n'
+fi
+
 step "sweep"
 for size in 640x360 320x180; do
 	if python3 tools/sweep.py --binary "$SFTEST" --size $size --jobs 4 >/tmp/splitflap-sweep-$size.log 2>/dev/null; then

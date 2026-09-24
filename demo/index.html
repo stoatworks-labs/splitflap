@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Splitflap — browser demo | Stoatworks Labs</title>
+    <meta name="description" content="Try the Splitflap FFGL plugin for Resolume in your browser: the picture on a split-flap departures board, every cell a drum that can only turn forward and every flap in the air a hinged plate falling under gravity. The plugin's own copy, motor and board shaders ported to WebGL2, with its fall table, drum print and update decision ported to JavaScript." />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./vendor/kit.css" />
+    <link rel="canonical" href="https://splitflap-demo.stoatworks-labs.com/" />
+  </head>
+  <body>
+    <main id="demo">
+      <noscript>
+        <p>
+          This demo runs the plugin's shaders in your browser, so it needs
+          JavaScript and WebGL2. The plugin itself, its source and its downloads
+          are on
+          <a href="https://github.com/stoatworks-labs/splitflap">its repository</a>.
+        </p>
+      </noscript>
+    </main>
+
+    <script type="module" src="./plugin.js"></script>
+    <script
+      src="./vendor/support-footer.js"
+      defer
+      data-app="Splitflap"
+      data-repo="https://github.com/stoatworks-labs/splitflap"
+      data-note="A browser demo of the plugin's shaders and a port of its fall table, drum and update decision. Nothing you load here leaves your machine."
+    ></script>
+  </body>
+</html>

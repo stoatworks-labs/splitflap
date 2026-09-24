@@ -91,3 +91,19 @@ Resolume). It records the GL driver, which shader failed, the host clock's unit
 and whether audio reached the layer.
 
     ~/Library/Logs/splitflap/splitflap.YYYY-MM-DD.log
+
+## The browser demo
+- `demo/` is the page at splitflap-demo.stoatworks-labs.com: the four shaders
+  and the font table verbatim in `demo/plugin.js` (written by
+  `demo/tools/splice_shaders.py`), over a JS port of `Flap.cpp`, `Drum.cpp`,
+  `Font.cpp`, `Onset.cpp`, `Controls.cpp` and `ProcessOpenGL`'s sequence. No
+  audio; Update Now is a button; the integer controls are dropdowns.
+- `python3 demo/tools/check_shaders.py` holds every shader and the font to the
+  C++; `tools/verify.sh` runs it. Change a shader: run the splice, never edit
+  the JS copy.
+- `demo/vendor/` is the shared kit, vendored by stoatworks-backend's
+  `resolume-demo/sync.sh`; never edit it.
+- Deploys on push to main (`.github/workflows/deploy.yml`), or by hand with
+  `cf-run npx wrangler deploy`. The host is a Worker ROUTE behind a proxied
+  AAAA record, not a custom domain (the zone is at Cloudflare's 100-domain
+  limit).

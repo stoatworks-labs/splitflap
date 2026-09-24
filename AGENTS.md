@@ -355,3 +355,42 @@ as split cells, none floods to a single tone.
 5. **Cost at 4K on the largest board** is a third of a frame. The board shader
    fetches the state texel and the drum per pixel and branches per half; a
    coarser pass per cell for the static halves would cut most of it.
+
+## The browser demo
+
+`demo/` is the page at splitflap-demo.stoatworks-labs.com, built on the fleet's
+demo kit (`demo/vendor/`, vendored by stoatworks-backend's
+`resolume-demo/sync.sh`; never edit it). Two halves, not equally faithful:
+
+- **The shaders are the plugin's.** `demo/plugin.js` carries all four GLSL
+  programs of `Shaders.cpp` verbatim (two backticks in a comment escaped) and
+  the glyph table of `Font.cpp`, both written by `demo/tools/splice_shaders.py`.
+  `demo/tools/check_shaders.py` compares them character for character and
+  `tools/verify.sh` runs it. Change a shader: run the splice, never edit the
+  JS copy. The motor runs on an RGBA32F ping-pong sized to the grid, as here,
+  so the regrid and the state across a picture resize are the plugin's own
+  arithmetic; the page needs EXT_color_buffer_float and says so if it is
+  missing.
+- **The CPU half is a port.** `Flap.cpp` (RK4 in double, sampled to the
+  2048-entry table), `Drum.cpp` (tones, the six palettes, the 45-character
+  alphabet, the three orders, the message), `Font.cpp`'s texture, `Onset.cpp`,
+  `Controls.cpp`, and `ProcessOpenGL`'s clock clamp (0.25 s), update decision
+  (Interval ticking from the mode's start, a stall giving one update), board
+  geometry and state ping-pong are rewritten in JavaScript. Nothing checks a
+  port but a reader; `sftest` checks the C++ and has never heard of this page.
+  The clock's unit is declared as seconds, as `sftest` declares it; the vote
+  never runs.
+- **What the page cannot do, and says.** No audio reaches it: the Audio buffer
+  is absent, the detector is handed silence, Onset mode latches frame one and
+  never fires again. Update Now (an event) is a button pressed for one frame.
+  Columns, Rows, Flaps and Module Width (`FF_TYPE_INTEGER`) are dropdowns of
+  every value. On the first frame the plugin binds the buffer it is writing as
+  PrevState too; WebGL refuses that, so the page binds a 1 × 1 texel instead
+  (the shader never reads it: OldGrid is zero). MaxUV is (1, 1). The About
+  block is absent. The banner and the disclosure at the foot say all of it.
+- The Worker is a **route** (`wrangler.toml`) behind a proxied `AAAA 100::`
+  record (id `74e141745a5824fd0196d8f99d2e7d6c`) made through the API on
+  2026-09-24, because stoatworks-labs.com is at Cloudflare's limit of 100
+  Workers custom domains. Delete the record and the page goes dark on a green
+  deploy. `deploy.yml` redeploys on every push to main; the live `<head>`
+  check must say "serving this build".

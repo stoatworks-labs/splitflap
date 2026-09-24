@@ -203,3 +203,15 @@ The mechanism is the split-flap display's own — a drum that turns one way —
 and the flap's fall is the textbook rigid plate about an edge. No board's
 typeface, artwork or sound was used: the font is graticule's, the palettes are
 authored here, and there is no clatter because FFGL has no audio output.
+
+## The browser demo
+
+[splitflap-demo.stoatworks-labs.com](https://splitflap-demo.stoatworks-labs.com)
+runs the plugin's own shaders in WebGL2 on generated clips — the motor that
+holds every cell's state in a float texel included — with the fall table, the
+drum print, the font, the onset detector and the update decision ported to
+JavaScript by hand. It is a port to a web page rather than the plugin: no audio
+reaches it (Onset mode never fires), Update Now is a button, the integer
+controls are dropdowns, and it says all of this on the page.
+`demo/tools/check_shaders.py` holds the page's copy of every shader and of the
+font to the C++, and `tools/verify.sh` runs it.
