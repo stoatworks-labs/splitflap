@@ -115,12 +115,13 @@ Verified, by measurement on this machine (Apple Silicon, macOS 26.4), with
 - **The pipe.** Three 64×36 frames are 27,648 bytes; a reader that hangs up
   gets exit status 1, not SIGPIPE's 141.
 - **Cost**, `sftest --bench` (60 frames after a 20-frame warm-up, glFinish both
-  sides, the largest board the controls allow, 96×54): **1.99 ms at 1280×720,
-  3.01 ms at 1920×1080, 5.53 ms at 3840×2160** — measured during `verify.sh`
-  on a machine running seven other builds; an idle run of the arm64 dev
-  build gave 0.91, 2.04 and 4.19 ms. A third of a 60 fps frame at 4K on the
-  biggest board: the board pass is one texel fetch and a few branches per
-  pixel, and it is not free.
+  sides, the largest board the controls allow, 96×54, the universal build):
+  **1.16 ms at 1280×720, 1.60 ms at 1920×1080, 4.21 ms at 3840×2160** — a
+  quarter of a 60 fps frame at 4K on the biggest board. Measured on a machine
+  running seven other builds: the same binary read 6.0, 7.4 and 11.6 ms with
+  the load average at 13 and 1.99, 3.01 and 5.53 ms during `verify.sh`, so
+  the numbers above are the quietest of four runs, not a promise. The board
+  pass is one state fetch and a few branches per pixel; it is not free.
 - The bundle is universal (`lipo`: x86_64 arm64), exports `plugMain`, ad-hoc
   signs, and probes under oxbow as **SW Splitflap / SF01 / effect**.
 
