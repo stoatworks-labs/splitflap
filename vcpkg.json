@@ -1,0 +1,11 @@
+{
+  "name": "splitflap",
+  "version-string": "0.1.0",
+  "description": "Dependencies for building the Splitflap FFGL plugin. GLEW is only needed on Windows; macOS uses the system OpenGL framework. There is nothing else: the flap's fall is solved in Flap.cpp, the font is a table in Font.cpp, and the only audio that reaches the plugin is the host's own FFT buffer.",
+  "dependencies": [
+    {
+      "name": "glew",
+      "platform": "!osx"
+    }
+  ]
+}

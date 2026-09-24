@@ -1,0 +1,83 @@
+name: ci
+
+# Both platforms on every push and pull request, so a Dependabot bump has a
+# status check to gate on and a GLEW-shaped break -- which macOS is
+# structurally blind to, because macOS never links GLEW -- is caught before a
+# tag. There is no Linux job: the CMakeLists branches on APPLE and WIN32.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  macos:
+    name: macOS
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        # arm64 only, unlike the release build's universal arm64;x86_64 -- the
+        # second slice doubles the build for no extra signal, because a source
+        # break is not architecture-specific.
+        run: >
+          cmake -B build
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_OSX_ARCHITECTURES=arm64
+          -DSPLITFLAP_BUILD_TOOLS=ON
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: The picture
+        # Every check reads the rendered picture, at 640x360 and at 320x180,
+        # through the real plugin class in a headless CGL context. They hold
+        # on a whole-pixel grid with tolerances written down per check in
+        # AGENTS.md, so they should hold on the runner's software GL.
+        run: |
+          for t in flips asymmetry settle fall resize prime negative names; do
+            ./build/sftest "--$t"
+          done
+
+      - name: Controls
+        # At 320x180 (CI's raster, the smaller of the two verify.sh sweeps),
+        # two at a time: the runner has no GPU and the question is only whether
+        # a control changed ANY subpixel.
+        timeout-minutes: 25
+        run: python3 tools/sweep.py --size 320x180 --jobs 2
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: splitflap-macos-arm64
+          path: build/*.bundle
+          if-no-files-found: error
+
+  windows:
+    name: Windows
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure
+        # The toolchain path MUST stay double-quoted: a `run:` step on Windows
+        # is PowerShell, and unquoted this expands to nothing.
+        run: >
+          cmake -B build -A x64
+          -DCMAKE_BUILD_TYPE=Release
+          -DSPLITFLAP_BUILD_TOOLS=OFF
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: splitflap-windows-x86_64
+          path: build/Release/*.dll
+          if-no-files-found: error

@@ -1,0 +1,93 @@
+# splitflap
+
+The picture on a split-flap departures board, as an FFGL **effect** for
+Resolume Arena/Avenue. C++/GLSL, CMake MODULE → universal `.bundle` (macOS) +
+Windows `.dll`. MIT. Intended home `github.com/stoatworks-labs/splitflap`.
+
+Read `AGENTS.md` before changing the motor, the state encoding, the flap curve
+or the parameter list.
+
+## Commands (CMake)
+- Configure: `cmake -B build -DCMAKE_BUILD_TYPE=Release`
+- Fast dev build: add `-DCMAKE_OSX_ARCHITECTURES=arm64` (use a different
+  directory, e.g. `build-dev`; `tools/verify.sh` deletes and rebuilds `build`)
+- Build: `cmake --build build`
+- Install into Arena: `cmake --install build` → `~/Documents/Resolume Arena/Extra Effects`
+  (untested; never run by this repo's own workflow)
+- Render a frame offline: `./build/sftest --out /tmp/f.png --size 1920x1080 --frames 120`
+  (`--drift 2` walks the test card sideways so the board has something to chase)
+- Set anything by name: `--set "Columns=16" --set "Drum=2" --set "Text=GATE 9"`
+  (options by index: Drum 0 Tones, 1 Colours, 2 Text; Drum Order 0 Dark to
+  Light, 1 Light to Dark, 2 Shuffled; Update 0 Continuous, 1 Interval, 2 Onset,
+  3 Manual; Palette 0 Amber, 1 Airport, 2 Rainbow, 3 Ocean, 4 Ember, 5 Candy)
+- Frames for video: `./build/sftest --pipe --size 1920x1080 --fps 60 --script cues.txt | ffmpeg -f rawvideo -pix_fmt rgba -s 1920x1080 -r 60 -i - out.mov`
+  — a cue script is `frame  Parameter Name  value`; standard parameters ramp
+  between keys, options/booleans/integers/events STEP. A reader that hangs up
+  gets exit 1 (SIGPIPE is ignored). With nothing on stdin and `--frames N` it
+  films the test card.
+- List parameters: `./build/sftest --list` (prints the real range of an option)
+- Demo clips: `tools/clips.sh [out-dir]` (needs ffmpeg and a Resolume install)
+
+## Verify
+- Everything: `tools/verify.sh` (fresh universal build + every check + two sweeps, ~3 min; bash, not zsh)
+- **The checks, each read off the rendered picture at 640x360 and 320x180:**
+  - `./build/sftest --flips` — every cell makes (t − c) mod N flips, as tone changes on its top row
+  - `./build/sftest --asymmetry` — one step brighter is one flip time, one darker N − 1
+  - `./build/sftest --settle` — a still input lands on the nearest flap within the bound, then bit-identical
+  - `./build/sftest --fall` — the flap's projected height against the harness's own rigid-body solution; lands on frame 59 of a one-second flip
+  - `./build/sftest --resize` — a picture resize and an 8 → 16 column regrid mid-flip keep every flap
+  - `./build/sftest --prime` — loud audio on frame one fires nothing; a real onset fires
+  - `./build/sftest --negative` — every check against its broken model; each must fail
+  - `./build/sftest --names` — no name over 16 characters, none duplicated
+  - `./build/sftest --font` — the Text drum's alphabet, as glyphs
+- Cost: `./build/sftest --bench`
+- No dead controls: `python3 tools/sweep.py` (`--size WxH`, `--jobs N`, `--binary PATH`)
+- The mutation test: `tools/mutate.sh` (one character of the shipped GLSL; a few minutes)
+
+## Notes
+- **The motor shader is the plugin.** One fragment per cell holds the state
+  (flap, phase, target, timer) in an RGBA32F texel, latches a target when the
+  update fires, and advances by the frame's `Dt`. A cell only ever moves
+  forward, one flap at a time. A wrong count is a motor fix; a wrong pixel is
+  a board-shader fix.
+- **Time never reaches the shader as an absolute.** The CPU's `Clock` settles
+  the host's unit and hands the motor a clamped frame delta. Resolume's clock
+  is ~499 million ms; a float phase from it would step by 0.03 s.
+- **The state's size is the grid's, not the picture's.** A picture resize does
+  not touch it; a Columns/Rows change re-maps the old state onto the new grid
+  in the motor pass (the buffer being written is sized to the new grid, the one
+  being read is whatever the last frame's grid was).
+- **Frame one primes the onset detector.** Previous spectrum = current, floor
+  seeded from the level; the floor only moves when `dt > 0`.
+- **A cell's mean is sixteen taps at a whole mip level** whose texel is at most
+  an eighth of the cell, so the taps' footprints stop at the cell's edge.
+  Trilinear at the cell's own level bleeds the neighbours in.
+- **Options map by index in `Controls.cpp` (`OptionIndex`)**; the SDK's range
+  for an option reads back 0..1 whatever the element count, and `--list`
+  prints the real one for the sweep.
+- **GLSL reserved words**: `patch sample input output filter common active half
+  layout flat`. The plate's rest shade is `plateShade`, not `flat`.
+- `SetParamInfo` clamps a STANDARD default into 0..1; Columns, Rows, Flaps and
+  Module Width are `FF_TYPE_INTEGER`, which is exempt.
+- Override `SetTextParameter` to return `FF_SUCCESS` for the About block, or no
+  host can instantiate the plugin. Here it also stores `Text`.
+- `splitflap_core` is an OBJECT library, not STATIC.
+- macOS build must be universal. Verify with `lipo`, never the build log.
+- FFGL id is `SF01`. Display name `SW Splitflap`. Bundle id `com.stoatworks.ffgl.splitflap`.
+- `StoatworksAbout.h` (with `guide=""`) and `ATTRIBUTIONS.md` are provisional
+  hand copies; registration regenerates them and adds the user-guide button
+  (then `Controls.h` needs a `PT_ABOUT_BUTTON_4`, and the `static_assert` in
+  `Splitflap.cpp` will say so).
+
+## Not done yet
+- Never loaded into Resolume on any platform; no real audio has reached it in
+  a host. CI is written, not run. The harness has run on this Mac's GPU only.
+- No presets, no OpenFX port, no browser demo, no user guide.
+
+## Diagnostics
+
+`source/Diag.{h,cpp}` — log file only, no crash handler (this runs inside
+Resolume). It records the GL driver, which shader failed, the host clock's unit
+and whether audio reached the layer.
+
+    ~/Library/Logs/splitflap/splitflap.YYYY-MM-DD.log
