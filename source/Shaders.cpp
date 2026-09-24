@@ -119,8 +119,11 @@ int targetFor( ivec2 cell )
 	if( DrumMode == 2 )
 	{
 		//The message is the target where the clip is bright, the blank where it
-		//is not.
-		if( luma < 0.5 )
+		//is not. A quarter of full luma, not half: a cell's MEAN is low even
+		//where a bright object sits on black, and at 0.5 no bundled demo clip
+		//lit more than 18 of 120 cells (the release survey, 2026-09-24); at
+		//0.25 the brightest lights 92 and the dark ones stay blank.
+		if( luma < 0.25 )
 			return 0;
 		return int( texelFetch( Message, cell, 0 ).r + 0.5 );
 	}

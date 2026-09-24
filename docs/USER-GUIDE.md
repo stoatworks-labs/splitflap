@@ -152,8 +152,9 @@ the cell's height, **0 to 12 %**; **3 % at the default of 0.25**. At 0 the halve
   mean colour.
 - *Text*: a fixed drum of 45 characters — the blank first, then `A`–`Z`, `0`–`9` and `- . : ! ? /
   ' &` — and the message in **Text** laid across the board one character a cell, wrapping at
-  Columns. A cell's target is its character where the cell's mean luma is at least 0.5 and the
-  blank where it is not. Flaps is ignored.
+  Columns. A cell's target is its character where the cell's mean luma is at least 0.25 and the
+  blank where it is not. Flaps is ignored. A quarter, not a half, because a cell's mean is low even
+  where a bright object sits on black: at a half no bundled demo clip lit more than 18 of 120 cells.
 
 **Flaps** — N, the flaps on each drum, **2 to 64**; **12** by default. An integer. Fewer flaps is a
 coarser picture and a shorter way round; more is a smoother picture and a longer churn for a
@@ -329,7 +330,7 @@ has on its current flap and carries on to its old target's index, which on a big
 a long way round, until the next update replaces the target. In Manual or Interval mode press
 Update Now after the change.
 
-**The Text drum shows nothing.** Nothing in the clip reaches a mean luma of 0.5, so every cell is
+**The Text drum shows nothing.** Nothing in the clip reaches a mean luma of 0.25, so every cell is
 on the blank. Brighten the clip, or send a white shape across it. A message longer than Columns
 × Rows is cut off.
 
@@ -375,8 +376,8 @@ ever reached the layer.
 - **No real audio has reached it in a host.** The onset detector's thresholds were set on
   synthetic spectra, and nobody has measured what Resolume's 64 FFT bins carry; the detector sums
   over every bin so their layout does not matter to it.
-- **The Text threshold is a constant** (a mean luma of 0.5). There is no control for it in
-  v0.1.0.
+- **The Text threshold is a constant** (a mean luma of 0.25, lowered from 0.5 before the tag on
+  the demo-clip survey). There is no control for it in v0.1.0.
 - **Cells in a module share a start delay, not a shaft phase.** They start together and land
   when their own counts say; a real shared shaft would flip them in lockstep.
 - **The cell's mean is read from the driver's mip pyramid**, so a cell near a tone boundary can
