@@ -50,10 +50,19 @@ out of that one constraint. Nothing is animated by hand.
   the flicker you see on a real board, and it is solved from θ″ = (3g/2L) sin θ
   once, in double, on the CPU.
 
+[![Splitflap — the picture on a split-flap departures board, for Resolume](docs/video-thumb.png)](https://www.youtube.com/watch?v=72hGrIignmk)
+
+*[Watch it](https://www.youtube.com/watch?v=72hGrIignmk) — 62 seconds: the
+board flipping up to the picture and chasing the clip, the tails a moving
+shape drags when darkening is the whole drum, Flip Time slow and fast, the
+fall on eight big cells at a second a flap, three palettes, a departures
+listing on the Text drum latched and then scrambled, and Interval updates with
+Stagger and Module Width. Rendered through `sftest --pipe`, silent.*
+
 ![A 16 by 9 board of black flaps with GATE 9 lit in cream where the clip is bright](docs/text.png)
 
 <sub>The Text drum: the message is the target where the clip is bright, the
-blank flap where it is not. Every letter is a run of flips from the blank.</sub>
+blank flap where it is not. Every letter is a run of flips from the blank; a cell lights at a quarter of full luma.</sub>
 
 ## Controls
 
@@ -80,7 +89,7 @@ clip continuously.
 
 ## Status
 
-**v0.1.0, built 2026-09-24, unreleased, and honestly early.**
+**v0.1.0, released 2026-09-24, and honestly early.**
 
 Verified, by measurement on this machine (Apple Silicon, macOS 26.4), with
 `tools/verify.sh` green:
@@ -124,10 +133,11 @@ Verified, by measurement on this machine (Apple Silicon, macOS 26.4), with
   pass is one state fetch and a few branches per pixel; it is not free.
 - The bundle is universal (`lipo`: x86_64 arm64), exports `plugMain`, ad-hoc
   signs, and probes under oxbow as **SW Splitflap / SF01 / effect**.
+- **Windows, in Resolume Arena 7.27.1** (win-lab, Mesa llvmpipe, no GPU, 2026-09-24): the v0.1.0 candidate DLL loads from Extra Effects, registers as `SW Splitflap` / `SF01` / effect, all 30 host controls match the declaration in name, order, type, range and default, it renders and Arena's log stays clean: 9 of the fleet gate's 9 checks, with 15 controls moving the picture (Cell Aspect under Fit off, Palette under the Colours drum). Seven controls read inert on the gate's still carrier by design: Flip Time, Stagger, Module Width, Update, Interval, Bounce and Drum Order act only while cells are moving or settle to the same tone, and the harness measures each of them; Audio was skipped for want of a sound device. Software rendering says nothing about a GPU or about speed.
 
 Not verified, and not pretended:
 
-- **Never loaded into Resolume**, on any platform. Everything above is the
+- **Never loaded into Resolume on macOS.** Everything above is the
   offline harness driving the real plugin class in a headless GL context. How
   23 controls in four groups present in the inspector, and whether a Text
   parameter on an effect edits comfortably there, is untested.
@@ -137,14 +147,20 @@ Not verified, and not pretended:
   set on synthetic spectra, not on programme material through Resolume's FFT.
 - **The harness has run on this Mac's GPU only.** CI is written but has not
   run.
-- No factory presets, no OpenFX port, no browser demo, no user guide.
+- No factory presets and no OpenFX port. There is a [user guide](https://stoatworks-labs.com/software/splitflap/guide/)
+  and a browser demo at [splitflap-demo.stoatworks-labs.com](https://splitflap-demo.stoatworks-labs.com)
+  (a port of the shaders and the CPU half to a web page, not the plugin).
+- **The Text drum lights a cell at a quarter of full luma**, lowered from a half before the
+  tag: the release survey measured every bundled demo clip's cell means at the latch frame,
+  and at 0.5 none lit more than 18 of 120 cells. Rainbow and Candy have no dark stop, so a
+  dark cell takes their first swatch; the guide says which palettes to use on a dark clip.
 
 ## Installing
 
 Build (below) and `cmake --install build`, which puts `Splitflap.bundle` into
 `~/Documents/Resolume Arena/Extra Effects`; for Avenue pass
-`--prefix "$HOME/Documents/Resolume Avenue/Extra Effects"`. Untested: nothing
-in this repo has run inside Resolume.
+`--prefix "$HOME/Documents/Resolume Avenue/Extra Effects"`. On macOS nothing in
+this repo has run inside Resolume; on Windows the release DLL has (below).
 
 ## Building
 

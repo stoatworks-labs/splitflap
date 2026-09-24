@@ -4,9 +4,10 @@
 the clip on a split-flap departures board: every cell a drum of flaps that can
 only turn forward, one flap at a time, at the motor's rate, and every flap in
 the air a hinged plate falling under gravity. C++17 + GLSL 4.10, CMake,
-universal macOS `.bundle` and a Windows `.dll`. MIT. Intended home
-`github.com/stoatworks-labs/splitflap`; built 2026-09-24 as a local v0.1.0 and
-**never loaded into Resolume**.
+universal macOS `.bundle` and a Windows `.dll`. MIT. Home
+`github.com/stoatworks-labs/splitflap`; built and released 2026-09-24 as v0.1.0,
+**never loaded into Resolume on macOS** (the Windows build has been, on the
+fleet's Arena gate; see the release section at the end).
 
 `CLAUDE.md` is the command reference. This file is the *why*: the idea, every
 number in the harness and where its tolerance comes from, whether each would
@@ -263,7 +264,7 @@ composites over the layers below). The letterbox is transparent, not black,
 for the same reason.
 
 **Text: the message is the target where the clip is bright.** Each cell shows
-its character of the message when its mean luma is ≥ 0.5, else the blank; the
+its character of the message when its mean luma is ≥ 0.25, else the blank; the
 drum is a fixed alphabet of 45 (blank first), so a letter is a run of flips
 from the blank and back. `Flaps` is ignored in Text mode. The threshold is a
 constant; a control for it was left out of 0.1.0.
@@ -332,21 +333,52 @@ as split cells, none floods to a single tone.
 
 **Assumed, or not yet done:**
 
-- **Never loaded into Resolume.** How the Text parameter presents on an
-  effect, whether four groups of 23 read well, whether the RGB triple shows as
-  a swatch: untested.
+- **Never loaded into Resolume on macOS.** On Windows the Arena gate has
+  (below): the Text parameter, the four groups and the RGB triple all present
+  as declared, 30 controls in all with the About block.
+- **Windows, in Resolume Arena 7.27.1** (win-lab, Mesa llvmpipe, no GPU, 2026-09-24): the v0.1.0 candidate DLL loads from Extra Effects, registers as `SW Splitflap` / `SF01` / effect, all 30 host controls match the declaration in name, order, type, range and default, it renders and Arena's log stays clean: 9 of the fleet gate's 9 checks, with 15 controls moving the picture (Cell Aspect under Fit off, Palette under the Colours drum). Seven controls read inert on the gate's still carrier by design: Flip Time, Stagger, Module Width, Update, Interval, Bounce and Drum Order act only while cells are moving or settle to the same tone, and the harness measures each of them; Audio was skipped for want of a sound device. Software rendering says nothing about a GPU or about speed.
 - **No real audio.** The detector's thresholds are from synthetic spectra; the
   bins' magnitude law is unmeasured and the detector deliberately assumes
   nothing about it.
-- **This Mac's GPU only.** CI is written and unrun.
-- No presets, no OpenFX port, no browser demo, no user guide.
+- **This Mac's GPU, and GitHub's macOS runner** (the checks and the sweep pass
+  there on software GL).
+- No presets, no OpenFX port. There is a user guide (`docs/USER-GUIDE.md`) and
+  a browser demo (`demo/`).
+
+## What the release survey and film found (2026-09-24)
+
+Every bundled Resolume demo clip went through the defaults, the Colours drum
+and the Text drum (one still each), and the release video was rendered through
+`sftest --pipe` from a cue sheet in stoatworks-backend
+(`video/projects/splitflap/render.py`). Three facts came out of it, two of
+them about the plugin:
+
+- **The Text threshold was too high for real footage.** At the shipped 0.5, a
+  per-cell measurement of every clip's mean luma at the latch frame found no
+  clip lighting more than 18 of 120 cells of a 20x6 board: a cell's mean is
+  low even where a bright object sits on black. Lowered to 0.25 before the
+  tag, where the brightest clip lights 92 and the dark clips stay blank. The
+  harness does not measure the threshold; the survey script is in the
+  release's scratch and the numbers are in the commit message (4c3a873).
+- **A palette with no dark stop floods a dark clip with its first swatch.**
+  Rainbow and Candy are all saturated stops, every one equally far from black,
+  so the nearest-swatch search resolves a dark cell to the first. Not a bug:
+  the guide names the palettes with a dark stop. The film's first fall beat
+  used Rainbow on a dark clip and came out solid red.
+- **A re-print or a regrid keeps the flap indices**, by design (the state is
+  indices), so switching Drum from a 12-flap Tones drum to the 45-flap Text
+  drum mid-run shows the letters printed on those indices and each cell goes
+  on to its old target's index until the next update. A 45-flap drum needs up
+  to 3.6 s to arrive at 80 ms a flap; the film's Text beat holds Manual for
+  six seconds so the message settles. Interval ticks from the moment the mode
+  is chosen, so the film presses Update Now at the switch.
 
 ## Open questions
 
 1. **Shared shaft phase within a module.** Cells on one drive should flip in
    lockstep, not merely start together; that needs a per-module phase, i.e. a
    fragment reading its module's first cell or a second small pass.
-2. **The Text threshold** (0.5 luma) is a constant. A control, or the clip's
+2. **The Text threshold** (0.25 luma; 0.5 until the release survey) is a constant. A control, or the clip's
    luma driving which *character* of a per-cell drum shows, are both plausible.
 3. **A reduce pass for the cell mean** would make the target independent of
    the driver's mip generation; the pyramid was chosen for cost.

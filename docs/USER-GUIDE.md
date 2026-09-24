@@ -29,6 +29,10 @@ intermediate flaps.*
 > character changed in the shipped shader is caught. All 23 controls are shown to change the
 > picture. It has **never been loaded into Resolume on macOS** — the one host it has run in is the
 > fleet's own test host, `oxbow`.
+> On Windows, a build of v0.1.0 loads, registers and renders in Resolume Arena 7.27.1, with all
+> 30 controls matching what the plugin declares, on software rendering, so that says nothing about
+> a GPU; the motor's time controls could not be shown moving there, because the gate's carrier is a
+> still picture and the board settles once. The harness measures them.
 > Try it on a spare layer before you put it in a show.
 >
 > This codebase was created with AI assistance, directed and reviewed by a human author.
