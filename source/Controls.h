@@ -78,11 +78,14 @@ enum ParamId : FFUInt32
 	// -- About ---------------------------------------------------------------
 	// One text line and one button per link. Its size is decided by
 	// StoatworksAbout.h at compile time, so Splitflap.cpp static_asserts this
-	// run against `about::kParamCount`. With guide="" that is four entries.
+	// run against `about::kParamCount`: five entries now the generated header
+	// carries the user guide's URL (text, User guide, Project page, Source on
+	// GitHub, Support the work).
 	PT_ABOUT_TEXT,
 	PT_ABOUT_BUTTON_1,
 	PT_ABOUT_BUTTON_2,
 	PT_ABOUT_BUTTON_3,
+	PT_ABOUT_BUTTON_4,
 
 	PT_COUNT_
 };

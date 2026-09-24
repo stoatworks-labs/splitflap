@@ -3,10 +3,8 @@
 Splitflap is built on other people's work. This file lists what that work is, who did
 it, and what it is doing here.
 
-**Provisional hand copy.** In a released repo this file is generated — the master
-lists live in the `stoatworks-backend` repo and are pushed out by
-`scripts/sync-attributions.py`. splitflap is not registered yet, so this copy was
-written by hand in the same shape; the first sync overwrites it.
+It is generated — the master lists live in the `stoatworks-backend` repo and are
+pushed out by `scripts/sync-attributions.py`. Edit it there, not here.
 
 ## Code we derived from other people's work
 
@@ -18,9 +16,9 @@ Someone else solved this first, and this project would not exist in its current 
 Licence: MIT  
 Copyright: Stoatworks Labs
 
-source/Font.{h,cpp} — the 5×7 bitmap font every character on the Text drum is printed with — carried across from graticule unchanged, by way of needle and pattern. It is graticule's own design, drawn as pictures in Font.cpp; it is not a copy of, and was not traced from, any board's typeface or any computer's ROM font.
+source/Font.{h,cpp}, the 5×7 bitmap font every character on the Text drum is printed with, carried across from graticule unchanged by way of needle and pattern. It is graticule's own design, drawn as pictures in Font.cpp; not a copy of, and not traced from, any board's typeface or any computer's ROM font.
 
-### Graticule Diag logger and host Clock — Stoatworks graticule
+### Diag logger and host Clock — Stoatworks graticule
 
 <https://github.com/stoatworks-labs/graticule>  
 Licence: MIT  
@@ -34,7 +32,7 @@ source/Diag.* (the log-file writer, from orrery via graticule) and source/Clock.
 Licence: MIT  
 Copyright: Stoatworks Labs
 
-source/PassBuffer.* — the SDK's FFGLFBO with the colour-texture leak fixed and the sampling mode owned by the buffer. The copy buffer and the two state buffers are PassBuffers.
+source/PassBuffer.*, the SDK's FFGLFBO with the colour-texture leak fixed and the sampling mode owned by the buffer. The copy buffer and the two state buffers are PassBuffers.
 
 ### Effect template and harness plumbing — Stoatworks tinsel, pattern and asciify
 
@@ -62,7 +60,7 @@ Libraries, SDKs and frameworks the project is built on or bundles.
 Licence: BSD-3-Clause  
 Copyright: FreeFrame
 
-Vendored as a git submodule at external/ffgl, pinned to b1afaf9.
+Vendored as a git submodule at external/ffgl (third_party/ffgl in oxbow).
 
 The plugin ABI itself. An FFGL effect or source is defined by this SDK's headers — there is no other way to be loadable by Resolume Arena and Avenue.
 
@@ -93,6 +91,12 @@ What this set out to be. No code, assets or binaries from any of these were used
 ### The split-flap display, as a mechanism
 
 A drum of printed flaps turned one way by a motor, hinged plates that fall and slap on to a stop: the public mechanism of every departures board since the 1950s, and all that was taken. No manufacturer's flap artwork, typeface, colour, dimensions or sound was used or measured; the fall is the textbook rigid plate about an edge, the palettes are authored here, the font is graticule's, and the plugin makes no sound because FFGL has no audio output. No maker is named or depicted on screen.
+
+## Standards and published specifications
+
+What the implementation is measured against.
+
+- **ITU-R BT.709** — The luma weights (0.2126, 0.7152, 0.0722) a cell's mean is read with when the drum is printed with tones or a message.
 
 ## Getting this wrong
 
