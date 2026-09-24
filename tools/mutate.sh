@@ -23,7 +23,7 @@ MUTANTS=(
 	"source/Shaders.cpp|			c = ( ( c + dir * steps ) % N + N ) % N;|			c = ( ( c + dir * steps ) % N - N ) % N;|flips|GLSL: a flap index that goes negative"
 	"source/Shaders.cpp|					float h = 0.5 * cos( theta );|					float h = 0.6 * cos( theta );|fall|GLSL: the flap in the air drawn 20% too tall"
 	"source/Shaders.cpp|		int remaining = ( ( t - c ) % N + N ) % N;|		int remaining = ( ( t - c ) % N + N ) % 9;|asymmetry|GLSL: the flaps still to pass, off the drum"
-	"source/Flap.cpp|			return model.gravityScale * std::sin( theta );|			return model.gravityScale * std::sin( theta ) ;|fall|solver: a no-op edit, which must NOT be caught -- the control for the controls"
+	"source/Flap.cpp|		return model.gravityScale * std::sin( theta );|		return model.gravityScale * std::sin( theta ) ;|fall|solver: a no-op edit, which must NOT be caught -- the control for the controls"
 )
 
 caught=0

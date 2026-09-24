@@ -150,7 +150,32 @@ the second half — the real onset later — catches the snapped floor.
 
 ## Mutation test
 
-**Run on the committed tree (2026-09-24), `tools/mutate.sh`.** MUTATION_RECORD
+**Run on the committed tree (2026-09-24, 4514a41), two ways.** First by hand,
+the brief's way: one character of the shipped GLSL, in the board shader's top
+half, `float h = 0.5 * cos( theta )` became `0.6 * cos( theta )` — the flap in
+the air drawn 20 % too tall while it is above the horizontal. `--fall` failed
+its height comparison at both rasters (worst 14.67 px against L = 90 at
+640×360, 7.60 px against 45 at 320×180); the landing and flutter assertions
+held, as they should — the mutant touches neither. **`--flips` failed too**,
+15 of 32 cells at each raster, every one over-counted by one or two: the
+taller flap keeps the top row covered into angles where its Lambert shade has
+moved the read tone a step, and each step counts as a transition. That is a
+fact about the count worth having: it relies on the top row being uncovered
+(u ≈ 0.3) before the shade moves a tone, which the correct height gives with
+room to spare and 20 % more does not. `--asymmetry` and `--settle` were not
+affected. Reverted with `git checkout -- source/Shaders.cpp`; `git diff
+--stat -- source` read empty, and after the rebuild `--flips` and `--fall`
+passed again.
+
+Then `tools/mutate.sh`, which builds each mutant in its own copy of the tree
+and never touches the working tree: the same height mutant (caught by
+`--fall`); `( c + dir * steps ) % N + N` with the `+ N` made `- N`, a flap
+index that goes negative, caught by `--flips` on every cell that wraps (6
+assertions); `remaining = ( ( t - c ) % N + N ) % N` with the last `N` made
+`9`, the flaps still to pass counted off the drum, caught by `--asymmetry` on
+the darken at both rasters (4 assertions); and a control for the controls, a
+whitespace-only edit to `Flap.cpp`, which builds and passes `--fall` as it
+must. 4 of 4 behaved as expected.
 
 ---
 
