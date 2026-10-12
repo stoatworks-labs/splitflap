@@ -174,8 +174,9 @@ What isn't verified:
   magnitude over all 64 bins and only asks whether more of them just got
   louder, so it assumes nothing about the bins' layout. Its thresholds were
   set on synthetic spectra, not on programme material through Resolume's FFT.
-- **The harness has only run on this Mac's GPU.** CI is written but hasn't
-  run.
+- **The harness has only run on macOS.** That's this Mac's GPU and, in CI,
+  GitHub's macOS runner, where the picture checks and the control sweep pass on
+  software GL. The Windows CI job builds the DLL and runs no checks.
 - No factory presets and no OpenFX port. There's a [user guide](https://stoatworks-labs.com/software/splitflap/guide/)
   and a browser demo at [splitflap-demo.stoatworks-labs.com](https://splitflap-demo.stoatworks-labs.com)
   (a port of the shaders and the CPU half to a web page, rather than the plugin).
