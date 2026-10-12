@@ -7,8 +7,9 @@
 > check comes with a negative control that has to fail, and all six do. All 23
 > controls change the picture at both rasters, and the bundle registers,
 > instantiates and lights pixels under the fleet's oxbow host. **It has never
-> been loaded into Resolume.** The flips, the fall and the rest are measured
-> one by one under Status.
+> been loaded into Resolume on a Mac.** On Windows, the v0.1.0 candidate passed
+> the fleet's gate in Resolume Arena 7.27.1, on software rendering. The flips,
+> the fall and the rest are measured one by one under Status.
 
 Your picture on a split-flap departures board, the clattery kind from old stations and
 airports, as an FFGL **effect** for Resolume Arena and Avenue. Every cell is a drum of flaps
@@ -165,8 +166,8 @@ Verified by measurement on this Mac (Apple Silicon, macOS 26.4), with
 
 What isn't verified:
 
-- **Never loaded into Resolume on macOS.** Everything above is the
-  offline harness driving the real plugin class in a headless GL context. How
+- **Never loaded into Resolume on macOS.** Everything above but the Windows run
+  is the offline harness driving the real plugin class in a headless GL context. How
   23 controls in four groups look in the inspector, and whether a Text
   parameter on an effect is comfortable to edit there, is untested.
 - **No real audio has reached it in a host.** The onset detector sums root
